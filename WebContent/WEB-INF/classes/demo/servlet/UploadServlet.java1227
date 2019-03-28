@@ -1,0 +1,247 @@
+package demo.servlet;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.swing.JOptionPane;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
+
+import cn.itcast.goods.user.domain.User;
+
+/**
+ * �����Ĵ��룬�ϴ��ı���
+ */
+@SuppressWarnings("unused")
+@WebServlet("/UploadServlet1")
+public class UploadServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public UploadServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doPost(request,response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@SuppressWarnings("unchecked")
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub		
+		String username =request.getParameter("name");
+		//HttpSession session = request.getSession();
+		//System.out.println(session);		
+		//User user = (User) session.getAttribute("sessionUser");
+		//System.out.println(user);				
+		String[] strs=username.split("_"); //��ȡ�ַ���
+		strs[1]="1fjhgj11grt11jfg2fhdhgftrdhydj11";
+		File hosptialFile = new File(strs[0].toString()); //ҽԺ�ļ���
+		if(!hosptialFile.exists()){  
+			hosptialFile.mkdirs();  
+        } 
+		File userFile = new File(hosptialFile.getPath()+"/"+strs[1].toString()); //ҽԺ�µ��û��ļ���
+		
+		if(!userFile.exists()){  
+			userFile.mkdirs();  
+        }
+		
+		//post���ļ���ŵ�Ŀ¼
+        //File tempDirPath =new File(request.getSession().getServletContext().getRealPath("/")+userFile.getPath());
+		File tempDirPath =new File("/home/wangning/asd/"+userFile.getPath());
+        
+        if(!tempDirPath.exists()){  
+            tempDirPath.mkdirs();  
+        }  
+          
+        //���������ļ�����  
+        DiskFileItemFactory fac = new DiskFileItemFactory();      
+        //����servlet�ļ��ϴ����  
+        ServletFileUpload upload = new ServletFileUpload(fac);      
+        //�ļ��б�  
+        List<FileItem> fileList = null;      
+        //����request�Ӷ��õ�ǰ̨���������ļ�  
+        try {      
+            fileList = upload.parseRequest(request);      
+        } catch (FileUploadException ex) {      
+            ex.printStackTrace();      
+            return;      
+        }   
+        //�������ļ���  
+        String imageName = null;
+        String compressFileName = null;
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");//��ȡ���uuid����ֹ�ļ�������
+        //������ǰ̨�õ����ļ��б�  
+        Iterator<FileItem> it = fileList.iterator(); 
+       // compressFile = it.next().getName().split(".");
+       // System.out.println(compressFile[0]);
+        while(it.hasNext()){      
+            FileItem item =  it.next(); 
+            //���������ͨ���򣬵����ļ���������  
+            if(!item.isFormField()){  
+            imageName = uuid + item.getName();   //new Date().getTime()+Math.random()*10000+
+            System.out.println(item.getName() + "++++++++++++++++++++++++++++++++++++++++123"); 
+            compressFileName = item.getName();
+                     
+            BufferedInputStream in = new BufferedInputStream(item.getInputStream());     
+                BufferedOutputStream out = new BufferedOutputStream(        
+                        new FileOutputStream(new File(tempDirPath+"/"+imageName)));  
+                Streams.copy(in, out, true);  
+                  
+            }  
+        }
+       System.out.println(compressFileName);
+       String[] compre = compressFileName.split("\\.");
+       System.out.println(compre[0] + "***********************compre[0]");
+       String imagename = (tempDirPath.getAbsolutePath()+"/"+imageName).toString(); 
+       // 解压目录
+       String unzipName = tempDirPath.getAbsolutePath();
+        unzipName = unzipName.replace(strs[1], "");
+       String noPostfixname = imageName.substring(0, imageName.lastIndexOf("."));
+       String file_name = (tempDirPath.getAbsolutePath()+"/"+noPostfixname).toString(); 
+       
+       System.out.println(imagename+"--------imagename");
+       System.out.println(file_name+"--------file_name");
+       file_name = file_name.replace(strs[1] + "/", "");
+       System.out.println(strs[1]);
+       System.out.println(unzipName+"--------unzipName");
+       String deleteFile = unzipName + "/" + strs[1];   
+       String deleteCompressFileName = unzipName  + compre[0];
+      // System.out.println(deleteCompressFileName + "COMPRESSnAME+++++++++++++++++++++789");
+       UnZipOrRarUtils myzip = new UnZipOrRarUtils();
+       try {
+    	int unzipIf=1;
+    	File f = new File(imagename);
+		ZipFile zipFile = new ZipFile(imagename, "GBK");
+		String gbkPath;
+		Enumeration<?> e = zipFile.getEntries();
+		String strs1=username.split("_")[0]; 
+	    String judgePath = "/home/wangning/asd/"+strs1;
+	    File judgeDir = new File(judgePath);
+        File[] judgeList = judgeDir.listFiles();
+        Set<String> judgeName1 = new HashSet<>();
+        Set<String> dirName = new HashSet<>();
+		for (int j = 0; j < judgeList.length; j++) {
+		      if (judgeList[j].isDirectory()) {
+		          String fileName = judgeList[j].getName();
+		          String tempFileName=fileName.split("_")[0];				          
+		          judgeName1.add(tempFileName);	
+		      }
+		}
+		while (e.hasMoreElements()) {
+			ZipEntry zipEnt = (ZipEntry) e.nextElement();
+			gbkPath = zipEnt.getName();
+			if (zipEnt.isDirectory()) {
+				String mainDirName = (String)gbkPath.split("/")[0];
+				dirName.add(mainDirName);
+				System.out.println(mainDirName);
+		 }
+		}
+		//Judging rename or Chinese character or Sign in name.
+		Pattern patternCh = Pattern.compile("[\u4e00-\u9fa5]");
+		String regEx = "[ _.`~!@#$%^&*()+=|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]|\n|\r|\t";
+		String showError="";
+        Pattern patternSign = Pattern.compile(regEx);
+		int dirLength=judgeName1.size();
+		int numTemp=0;
+		String[] result１ = new String[dirName.size()];
+		Iterator helloDir =dirName.iterator();
+		while (helloDir.hasNext()) {
+			String dirNow=(String) helloDir.next();
+			System.out.println(dirNow+"*****"+numTemp);
+			Matcher m1 = patternCh.matcher(dirNow);
+			Matcher m2 = patternSign.matcher(dirNow);
+			if(m1.find()||m2.find()) showError="我是中国人，呦";
+			judgeName1.add(dirNow);
+			if(judgeName1.size()==dirLength) {
+				result１[numTemp]=dirNow;
+				numTemp++;
+			}else dirLength++;
+		}
+		if(showError.equals("")){
+		String[] result=new String[numTemp];
+		for(int k=0;k<numTemp;k++) {
+			result[k]=result１[k];
+			showError=showError+result[k]+":";
+		}		
+	
+		}
+		myzip.unZipFiles(imagename,unzipName);	
+		deleteDir(new File(deleteFile));
+	    System.out.println("deleteFIle+++++++++++++++");
+	    response.setContentType("text/html; charset=UTF-8");
+	    response.getWriter().print(showError);
+	    response.getWriter().close();
+	} catch (Exception e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+        PrintWriter out = null;  
+        try {  
+            out = encodehead(request, response);  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+        out.write("1");
+        out.close(); 
+        
+	}	
+	private PrintWriter encodehead(HttpServletRequest request,HttpServletResponse response) throws IOException{  
+        request.setCharacterEncoding("utf-8");  
+        response.setContentType("text/html; charset=utf-8");  
+        return response.getWriter();  
+    }  
+	
+	//��ѹ��ɺ� ɾ��ԭ�ļ���
+	public boolean deleteDir(File f) {
+		if(!f.exists()) {
+			return false;
+		}else if(f.isFile()) {
+			return f.delete();
+		}else {
+			for (File file : f.listFiles() ) {
+				deleteDir(file);
+			}
+		}
+		return f.delete();
+	}
+}
