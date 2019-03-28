@@ -10,7 +10,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="Huploadify.css"/>
+<link rel="stylesheet" type="text/css" href="HuploadifyDiagnose.css"/>
 <link rel="stylesheet" type="text/css" href="webuploader.css" />
 <link rel="stylesheet" type="text/css" href="style.css" />
 <style>
@@ -51,8 +51,11 @@ session.setAttribute("name",name1);%>
       		</div>
       	</div>  
       </div>
-    <button id="repalce"  class="upload-button" style="text-align:middle">点击检查文件</button>
-    <button class="upload-button" id="btn2" >点击上传文件</button>		   	   
+    <button id="repalce"  class="upload-button">诊断材料检查</button>
+    <button class="upload-button" id="btn2" >上传诊断材料</button>		   	   
+   <a href="http://10.15.0.10:8080/BB/qiye_admin/HTML_model/diagnose.pdf" target="_Blank"> <button class="upload-button" id="btn3" >查看诊断报告</button>	</a>
+    <a href="testServlet?filename=123.zip" ><button class="upload-button" id="btn3" >获取诊断文件</button>	</a>
+    	   	   
 </div>
 <script type="text/javascript">  
     var btn = document.getElementById("repalce");  
@@ -106,7 +109,7 @@ $(function(){
 		up.upload('*');
 	});
 	$('#btn3').click(function(){
-		up.cancel('*');
+		
 	});
 	$('#btn4').click(function(){
 		//up.disable();
